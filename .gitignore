@@ -1,0 +1,23 @@
+# Python
+__pycache__/
+*.py[cod]
+.venv/
+*.egg-info/
+
+# Secrets. Keep real passwords out of git.
+.env
+
+# Pytest and Playwright output
+.pytest_cache/
+test-results/
+playwright-report/
+blob-report/
+allure-results/
+allure-report/
+reports/
+logs/
+
+# Editors and OS files
+.idea/
+.vscode/
+.DS_Store
