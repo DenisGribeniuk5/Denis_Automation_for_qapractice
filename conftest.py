@@ -87,21 +87,28 @@ def contact(page):
 def pytest_runtest_logstart(nodeid, location):
     """Write the test name before its page steps, so the log is easy to follow."""
     global current_test
-    # "tests/test_home.py::test_home_shows_main_heading[chromium]" -> "test_home_shows_main_heading[chromium]"
+    # nodeid looks like "tests/test_home.py::test_the_main_heading_is_visible".
+    # Keep only the part after "::".
     current_test = nodeid.split("::")[-1]
-    log.info("START %s", nodeid)
+    log.info("pytest_runtest_logstart: START %s", nodeid)
 
 
 def pytest_runtest_logfinish(nodeid, location):
     """Clear the test name, so lines written after the test do not carry it."""
     global current_test
+    log.info("pytest_runtest_logfinish: FINISH %s", nodeid)
     current_test = "-"
 
 
 def pytest_runtest_logreport(report):
     """Write the result. Setup and teardown appear only when they do not pass."""
     if report.when == "call" or not report.passed:
-        log.info("%s %s (%s)", report.outcome.upper(), report.nodeid, report.when)
+        log.info(
+            "pytest_runtest_logreport: %s %s (%s)",
+            report.outcome.upper(),
+            report.nodeid,
+            report.when,
+        )
 
 
 @pytest.hookimpl(hookwrapper=True)
@@ -119,10 +126,82 @@ def pytest_runtest_makereport(item):
     if page is None:
         return
 
+    log.info("pytest_runtest_makereport: attach screenshot of the failed test")
     allure.attach(
         page.screenshot(),
         name="screenshot",
         attachment_type=AttachmentType.PNG,
+    )
+
+
+# pytest-bdd hooks. They run for every scenario in every feature file.
+# Each log line starts with the hook name, so you can see which hook wrote it:
+#   grep pytest_bdd_ logs/tests.log
+# Order for one step: before_step -> before_step_call -> after_step (or step_error).
+
+
+def pytest_bdd_apply_tag(tag, function):
+    """Runs once per tag on each scenario while pytest collects the tests, for example @smoke.
+
+    No test is running yet, so these lines show [-]. Returning None lets
+    pytest-bdd turn the tag into a mark as usual.
+    """
+    log.info("pytest_bdd_apply_tag: @%s", tag)
+    return None
+
+
+def pytest_bdd_before_scenario(request, feature, scenario):
+    log.info(
+        "pytest_bdd_before_scenario: Feature: %s | Scenario: %s",
+        feature.name,
+        scenario.name,
+    )
+
+
+def pytest_bdd_after_scenario(request, feature, scenario):
+    log.info("pytest_bdd_after_scenario: Scenario: %s", scenario.name)
+
+
+def pytest_bdd_before_step(request, feature, scenario, step, step_func):
+    """Runs before pytest-bdd prepares the step's arguments."""
+    log.info("pytest_bdd_before_step: %s %s", step.keyword, step.name)
+
+
+def pytest_bdd_before_step_call(
+    request, feature, scenario, step, step_func, step_func_args
+):
+    """Runs just before the Python function for the step is called."""
+    log.info(
+        "pytest_bdd_before_step_call: %s(%s)",
+        step_func.__name__,
+        ", ".join(step_func_args),
+    )
+
+
+def pytest_bdd_after_step(
+    request, feature, scenario, step, step_func, step_func_args
+):
+    log.info("pytest_bdd_after_step: PASSED %s %s", step.keyword, step.name)
+
+
+def pytest_bdd_step_error(
+    request, feature, scenario, step, step_func, step_func_args, exception
+):
+    log.error(
+        "pytest_bdd_step_error: FAILED %s %s -> %s: %s",
+        step.keyword,
+        step.name,
+        type(exception).__name__,
+        exception,
+    )
+
+
+def pytest_bdd_step_func_lookup_error(request, feature, scenario, step, exception):
+    """Runs when no function in tests/conftest.py matches the step's sentence."""
+    log.error(
+        "pytest_bdd_step_func_lookup_error: no step definition for %s %s",
+        step.keyword,
+        step.name,
     )
 
 
@@ -132,6 +211,7 @@ def pytest_sessionfinish(session, exitstatus):
     Pytest first writes raw files to allure-results/. The Allure command
     turns those files into reports/index.html. Open that file in a browser.
     """
+    log.info("pytest_sessionfinish: run finished, exit status %s", exitstatus)
     results = Path("allure-results")
     if not any(results.glob("*-result.json")):
         return

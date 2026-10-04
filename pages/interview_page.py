@@ -38,6 +38,17 @@ class InterviewPage(BasePage):
             "question_cards", page.locator("[data-testid^='question-card-']")
         )
 
+    def topic_checkbox(self, topic: str):
+        """The checkbox for one topic. topic is the end of its id, for example "python"."""
+        return self.set_locator(
+            f"{topic}_checkbox", self.page.get_by_test_id(f"filter-tech-{topic}")
+        )
+
+    def check_topic(self, topic: str):
+        """Tick any topic filter by clicking its label, the same way as check_javascript()."""
+        self.log.info("Tick %s filter", topic)
+        self.click(self.page.locator(f"label[for='tech-{topic}']"))
+
     def search(self, text: str):
         """Type into the library search. Playwright clears the box first with fill()."""
         self.log.info("Search interview questions")
