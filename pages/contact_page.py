@@ -23,7 +23,7 @@ class ContactPage(BasePage):
     def __init__(self, page: Page):
         super().__init__(page)
         self.heading = self.set_locator(
-            "heading", page.get_by_role("heading", name="Contact QA Practice")
+            "heading", page.get_by_text("Contact QA Practice", exact=True)
         )
         self.name_input = self.set_locator(
             "name_input", page.get_by_test_id("contact-name")

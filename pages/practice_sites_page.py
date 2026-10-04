@@ -16,8 +16,10 @@ class PracticeSitesPage(BasePage):
 
     def __init__(self, page: Page):
         super().__init__(page)
+        # The menu also says "Practice Sites", so the heading is the h1 only.
         self.heading = self.set_locator(
-            "heading", page.get_by_role("heading", name="Practice Sites")
+            "heading",
+            page.locator("h1").get_by_text("Practice Sites", exact=True),
         )
 
         # href is the stable locator. Card titles can be edited without

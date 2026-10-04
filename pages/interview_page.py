@@ -1,8 +1,8 @@
 """
 Interview question library: https://www.qapractice.com/interview
 
-The search field is a searchbox in the accessibility tree, so get_by_role
-finds it by the label a screen reader would announce.
+The search field is found by its data-testid string. The visible heading
+is found by its text.
 """
 
 from playwright.sync_api import Page
@@ -17,11 +17,10 @@ class InterviewPage(BasePage):
         super().__init__(page)
         self.heading = self.set_locator(
             "heading",
-            page.get_by_role("heading", name="Interview Question Library"),
+            page.get_by_text("Interview Question Library", exact=True),
         )
         self.search_box = self.set_locator(
-            "search_box",
-            page.get_by_role("searchbox", name="Search interview questions"),
+            "search_box", page.get_by_test_id("library-search")
         )
         # data-testid is on the checkbox. The visible word "JavaScript"
         # is on the label. This is the JavaScript topic, not the

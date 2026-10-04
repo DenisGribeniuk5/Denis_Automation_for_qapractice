@@ -2,7 +2,7 @@
 
 Class project: UI tests for [QA Practice](https://www.qapractice.com/) with **Python**, **pytest**, **Playwright**, **Allure**, and **uv**.
 
-The framework follows the Page Object Model and stays small on purpose (KISS). Locators live in `pages/`. Input values live in `data/`. Tests live in `tests/` and only call page methods.
+The framework follows the Page Object Model and stays small on purpose (KISS). Locators live in `pages/`. Behaviour is written in `features/` as Given, When, and Then. The Python for those sentences lives in `tests/conftest.py`.
 
 Run every command in this folder, the one that contains this README. If the terminal prompt says `QA Practice`, move in first:
 
@@ -30,7 +30,9 @@ helper/              # shared tools
   users.py           # get_user("valid") reads one username / password pair from .env
 .env                 # practice accounts, not committed
 logs/                # tests.log from the last run, not committed
-tests/               # one behaviour per test
+features/            # behaviour in plain language (Gherkin)
+tests/               # connect each feature to pytest
+  conftest.py        # one Python function per Given, When, or Then sentence
 pytest.ini           # pytest options, including the log file and its level
 pyproject.toml       # dependencies for uv
 ```
@@ -42,7 +44,7 @@ uv sync
 uv run playwright install chromium
 ```
 
-`uv sync` creates `.venv` and installs the Python packages from `pyproject.toml` (pytest, Playwright, Faker, python-dotenv, Allure's pytest plugin). The second command downloads the Chromium browser Playwright drives.
+`uv sync` creates `.venv` and installs the Python packages from `pyproject.toml` (pytest, pytest-bdd, Playwright, Faker, python-dotenv, Allure's pytest plugin). The second command downloads the Chromium browser Playwright drives.
 
 Install the Allure command-line tool once, separate from Python: [Allure install](https://allurereport.org/docs/install/). Without it, pytest still runs, but it cannot write `reports/index.html`.
 
@@ -136,8 +138,9 @@ The valid pair is the demo login published on the [login practice page](https://
 ## Add a test
 
 1. If the screen is new, add `pages/your_page.py` and inherit `BasePage`. Set `PATH` and the locators in `__init__`.
-2. Add a fixture in `conftest.py` only if several tests open that page directly.
-3. Add `tests/test_your_page.py`. Ask for the fixture by name and assert with `expect(...)`.
-4. If the test types text, put that text in `data/` and import it. Use `helper/fake.py` when the text should be made up. Do not paste the same string in the test and in the assertion.
+2. Add a fixture in the project `conftest.py` only if several scenarios open that page directly.
+3. Describe the behaviour in `features/your_page.feature` with Given, When, and Then.
+4. Add one function per new sentence in `tests/conftest.py`, then load the feature from `tests/test_your_page.py` with `scenarios(...)`.
+5. If the scenario types text, put that text in `data/` and import it. Use `helper/fake.py` when the text should be made up.
 
-Prefer `get_by_role` or `get_by_test_id`. The practice site puts `id` and `data-testid` on interactive elements so selectors stay stable.
+Prefer `get_by_text` or `get_by_test_id`. The practice site puts `id` and `data-testid` on interactive elements so selectors stay stable.
