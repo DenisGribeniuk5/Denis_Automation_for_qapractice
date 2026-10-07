@@ -1,146 +1,77 @@
-# Denis_Automation_for_qapractice
+# QA Practice UI tests
 
-Class project: UI tests for [QA Practice](https://www.qapractice.com/) with **Python**, **pytest**, **Playwright**, **Allure**, and **uv**.
+UI test framework for [qapractice.com](https://www.qapractice.com/), built with **Python**, **Playwright**, **pytest-bdd**, and **Allure**.
 
-The framework follows the Page Object Model and stays small on purpose (KISS). Locators live in `pages/`. Behaviour is written in `features/` as Given, When, and Then. The Python for those sentences lives in `tests/conftest.py`.
+48 scenarios cover the home page, the site menu, the practice-sites index, the interview question library (search and topic filters), and the contact form.
 
-Run every command in this folder, the one that contains this README. If the terminal prompt says `QA Practice`, move in first:
+## Stack
 
-```bash
-cd Denis_Automation_for_qapractice
-```
+| Concern | Tool |
+| --- | --- |
+| Browser automation | Playwright (sync API) via `pytest-playwright` |
+| Scenarios | Gherkin feature files run by `pytest-bdd` |
+| Reporting | Allure, saved as one HTML file, with a screenshot on failure |
+| Test data | Examples tables in the features, and Faker for generated input |
+| Dependencies | `uv`, with a locked `uv.lock` |
+
+## Design
+
+- **Page Object Model.** Each screen is a class in `pages/` that holds its locators and actions. `BasePage` owns the header menu shared by every page, and routes clicks and typing through one place so each action is logged.
+- **Locators by role, then test id.** Headings, links, and buttons are found by accessible role and name. Form fields and filters use the `data-testid` values the site provides. CSS by `href` is used only for the sandbox cards, which all share the same link text.
+- **Behaviour in plain language.** `features/` describes what a user does and sees. Step definitions in `tests/conftest.py` are thin: they call page objects and assert with Playwright's auto-waiting `expect`.
+- **Data-driven scenarios.** Each `*_ddt.feature` uses a `Scenario Outline` with an `Examples` table. One generic step covers every page, menu link, or topic, and lookup tables map the names in the table to page classes.
+- **Traceable runs.** Every log line carries the running test's name, so `grep <test name> logs/tests.log` shows one scenario's steps. Failed tests attach a screenshot to the Allure report.
+- **No side effects.** The contact scenarios fill and verify the form but never press "Open email draft", which would open the mail client on the machine running the suite.
 
 ## Layout
 
 ```
-config.py            # site address, used by every page
-conftest.py          # opens a page object for each test, then builds the Allure report
-pages/               # one class per screen
-  base_page.py       # header menu, shared by every page
-  home_page.py
-  practice_sites_page.py
-  interview_page.py
-  about_page.py
-  contact_page.py
-data/                # values the tests type in (not locators)
-  contact.py         # contact form message, built with helper.fake
-  interview.py       # search text
-helper/              # shared tools
-  fake.py            # fake_name(), fake_email(), fake_sentence(), fake_choice()
-  users.py           # get_user("valid") reads one username / password pair from .env
-.env                 # practice accounts, not committed
-logs/                # tests.log from the last run, not committed
-features/            # behaviour in plain language (Gherkin)
-tests/               # connect each feature to pytest
-  conftest.py        # one Python function per Given, When, or Then sentence
-pytest.ini           # pytest options, including the log file and its level
-pyproject.toml       # dependencies for uv
+features/        Gherkin scenarios; *_ddt.feature are the data-driven versions
+tests/
+  conftest.py    step definitions
+  test_*.py      load the feature files with scenarios()
+pages/           page objects, one per screen, all inheriting BasePage
+data/            input values for the plain scenarios
+helper/
+  fake.py        Faker wrappers
+  users.py       reads username / password pairs from .env (for the login sandbox)
+conftest.py      page fixtures, logging, failure screenshots, Allure report
+config.py        BASE_URL
 ```
-
-## Setup
-
-```bash
-uv sync
-uv run playwright install chromium
-```
-
-`uv sync` creates `.venv` and installs the Python packages from `pyproject.toml` (pytest, pytest-bdd, Playwright, Faker, python-dotenv, Allure's pytest plugin). The second command downloads the Chromium browser Playwright drives.
-
-Install the Allure command-line tool once, separate from Python: [Allure install](https://allurereport.org/docs/install/). Without it, pytest still runs, but it cannot write `reports/index.html`.
 
 ## Run
 
 ```bash
+uv sync
+uv run playwright install chromium
 uv run pytest
 ```
 
-Watch the browser:
+Useful variations:
 
 ```bash
-uv run pytest --headed
+uv run pytest -m smoke                         # smoke-tagged scenarios only
+uv run pytest tests/test_navigation_data_driven.py
+uv run pytest --headed --slowmo 500            # watch the browser
+uv run pytest --log-file-level=DEBUG           # also log locators and typed values
 ```
 
-Slow the actions down (the number is milliseconds):
+Copy `.env.example` to `.env` for the practice accounts. The values are the public demo login from the site.
 
-```bash
-uv run pytest tests/test_interview.py --headed --slowmo 500
-```
+## Report and logs
 
-Run one file:
+With the [Allure CLI](https://allurereport.org/docs/install/) installed, each run writes `reports/index.html`, a single file that opens straight from disk. Without it, the raw results stay in `allure-results/`.
 
-```bash
-uv run pytest tests/test_home.py
-```
-
-## Allure report
-
-`uv run pytest` saves the report as one HTML file: `reports/index.html`. Open that file:
-
-```bash
-open reports/index.html
-```
-
-A failed test includes a screenshot in the report.
-
-Do not run `allure generate -o allure-report` and do not open `allure-report/index.html`. That page loads its data from extra files. A browser opened from disk blocks those requests and shows **500 Failed to fetch**.
-
-## Logs
-
-Every run writes `logs/tests.log`. The next run replaces it.
-
-The default level is **INFO**. It records each test's start and result, every page opened, and every click:
+Each run also replaces `logs/tests.log`:
 
 ```
-2026-10-04 18:28:37 INFO  [test_start_practicing_opens_the_sandbox_list[chromium]] tests: START tests/test_home.py::test_start_practicing_opens_the_sandbox_list[chromium]
-2026-10-04 18:28:37 INFO  [test_start_practicing_opens_the_sandbox_list[chromium]] HomePage: Open https://www.qapractice.com/
-2026-10-04 18:28:40 INFO  [test_start_practicing_opens_the_sandbox_list[chromium]] HomePage: Click Start Practicing
-2026-10-04 18:28:40 INFO  [test_start_practicing_opens_the_sandbox_list[chromium]] tests: PASSED tests/test_home.py::test_start_practicing_opens_the_sandbox_list[chromium] (call)
+2026-10-04 18:28:37 INFO  [test_start_practicing_opens_the_sandbox_list] HomePage: Open https://www.qapractice.com/
+2026-10-04 18:28:40 INFO  [test_start_practicing_opens_the_sandbox_list] HomePage: Click Start Practicing
 ```
 
-The name in `[...]` is the running test, so you can search the log for one test's lines:
+## Adding a scenario
 
-```bash
-grep test_start_practicing logs/tests.log
-```
-
-**DEBUG** also records the values typed into forms:
-
-```bash
-uv run pytest --log-file-level=DEBUG
-```
-
-To log from a page object, use `self.log`. `BasePage` names it after the class:
-
-```python
-self.log.info("Click Submit")             # a step: always in the log
-self.log.debug("Email: %r", email)        # a detail: only with DEBUG
-```
-
-## Accounts
-
-`.env` stores each practice account as one pair, `username / password`:
-
-```
-VALID=user@premiumbank.com / Bank@123
-INVALID=wrong@example.com / nope
-```
-
-In a test:
-
-```python
-from helper.users import get_user
-
-username, password = get_user("valid")
-```
-
-The valid pair is the demo login published on the [login practice page](https://www.qapractice.com/practice-login-form). Do not put a real personal password in `.env`.
-
-## Add a test
-
-1. If the screen is new, add `pages/your_page.py` and inherit `BasePage`. Set `PATH` and the locators in `__init__`.
-2. Add a fixture in the project `conftest.py` only if several scenarios open that page directly.
-3. Describe the behaviour in `features/your_page.feature` with Given, When, and Then.
-4. Add one function per new sentence in `tests/conftest.py`, then load the feature from `tests/test_your_page.py` with `scenarios(...)`.
-5. If the scenario types text, put that text in `data/` and import it. Use `helper/fake.py` when the text should be made up.
-
-Prefer `get_by_text` or `get_by_test_id`. The practice site puts `id` and `data-testid` on interactive elements so selectors stay stable.
+1. New screen: add `pages/<name>_page.py` inheriting `BasePage`, with `PATH` and its locators.
+2. Write the scenario in `features/<name>.feature`.
+3. Add any new step sentences to `tests/conftest.py`.
+4. Load the feature from `tests/test_<name>.py` with `scenarios(...)`.
