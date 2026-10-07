@@ -1,8 +1,8 @@
 """
 Home page: https://www.qapractice.com/
 
-Locators use the visible text string, the same words a student sees on
-the screen. Reach for data-testid when the site provides one.
+Locators use the accessible role and name, the way a user or a screen
+reader finds the element. data-testid is used where the site provides one.
 """
 
 from playwright.sync_api import Page
@@ -17,17 +17,19 @@ class HomePage(BasePage):
         super().__init__(page)
         self.heading = self.set_locator(
             "heading",
-            page.get_by_text("The Ultimate Automation Playground", exact=True),
+            page.get_by_role(
+                "heading", name="The Ultimate Automation Playground", exact=True
+            ),
         )
-        # Match the words on the link. The site also sets role="button",
-        # but the visible text string is enough.
+        # These are <a> tags, but the site sets role="button" on them.
+        # get_by_role follows the accessible role, so ask for a button.
         self.start_practicing = self.set_locator(
             "start_practicing",
-            page.get_by_text("Start Practicing", exact=True),
+            page.get_by_role("button", name="Start Practicing", exact=True),
         )
         self.browse_questions = self.set_locator(
             "browse_questions",
-            page.get_by_text("Browse Interview Questions", exact=True),
+            page.get_by_role("button", name="Browse Interview Questions", exact=True),
         )
 
     def open_practice_sites_from_hero(self):

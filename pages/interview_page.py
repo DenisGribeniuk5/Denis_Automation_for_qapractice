@@ -1,8 +1,8 @@
 """
 Interview question library: https://www.qapractice.com/interview
 
-The search field is found by its data-testid string. The visible heading
-is found by its text.
+The heading is found by its role. The search box and filters use the
+data-testid values the site provides.
 """
 
 from playwright.sync_api import Page
@@ -17,7 +17,7 @@ class InterviewPage(BasePage):
         super().__init__(page)
         self.heading = self.set_locator(
             "heading",
-            page.get_by_text("Interview Question Library", exact=True),
+            page.get_by_role("heading", name="Interview Question Library", exact=True),
         )
         self.search_box = self.set_locator(
             "search_box", page.get_by_test_id("library-search")

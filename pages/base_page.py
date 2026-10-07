@@ -31,17 +31,17 @@ class BasePage:
         self.logo = self.set_locator("logo", self.header.locator("a.navbar-brand"))
         self.practice_sites_link = self.set_locator(
             "practice_sites_link",
-            self.header.get_by_text("Practice Sites", exact=True),
+            self.header.get_by_role("link", name="Practice Sites", exact=True),
         )
         self.interview_link = self.set_locator(
             "interview_link",
-            self.header.get_by_text("Interview Prep", exact=True),
+            self.header.get_by_role("link", name="Interview Prep", exact=True),
         )
         self.about_link = self.set_locator(
-            "about_link", self.header.get_by_text("About", exact=True)
+            "about_link", self.header.get_by_role("link", name="About", exact=True)
         )
         self.contact_link = self.set_locator(
-            "contact_link", self.header.get_by_text("Contact", exact=True)
+            "contact_link", self.header.get_by_role("link", name="Contact", exact=True)
         )
 
     def set_locator(self, name, locator):
