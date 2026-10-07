@@ -1,5 +1,3 @@
-# Data-driven version of practice_sites.feature.
-# One row per sandbox card. path is the card link's href.
 # Every card link says "Start practising", so the path is what tells them apart.
 # The store path really is spelled "ecommerece" on the site.
 Feature: Practice sites (data driven)

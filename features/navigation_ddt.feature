@@ -1,6 +1,3 @@
-# Data-driven version of navigation.feature.
-# A Scenario Outline is one scenario written once. Each row in Examples
-# runs it again, with <name> replaced by the value from that row's column.
 Feature: Site menu (data driven)
 
   @smoke

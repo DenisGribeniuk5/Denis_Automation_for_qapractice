@@ -1,14 +1,10 @@
 """
-Fixtures: setup that pytest hands to a test.
+Project-wide fixtures and hooks.
 
-pytest-playwright already provides `page` — a new browser tab per test,
-closed when the test finishes. You do not write browser start/stop code.
-
-A fixture named `home` opens the home page and returns the page object.
-The test asks for it by name:
-
-    def test_something(home):
-        ...
+- One fixture per page that opens it and returns the page object.
+- The running test's name on every log line.
+- A screenshot attached to Allure when a test fails.
+- A single-file Allure report in reports/ at the end of the run.
 """
 
 import logging

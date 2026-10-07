@@ -1,5 +1,3 @@
-# Data-driven version of home.feature.
-# Background runs before every row of every Scenario Outline below.
 Feature: Home page (data driven)
 
   Background:

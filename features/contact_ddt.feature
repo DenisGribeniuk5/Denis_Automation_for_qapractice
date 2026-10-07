@@ -1,5 +1,3 @@
-# Data-driven version of contact.feature.
-# Each row in Examples fills the form once, with one topic from the dropdown.
 # The scenario does not click "Open email draft", because that opens the mail app.
 Feature: Contact form (data driven)
 

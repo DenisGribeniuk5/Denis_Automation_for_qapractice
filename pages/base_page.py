@@ -1,11 +1,9 @@
 """
-Base page — shared behaviour for every screen.
+Shared behaviour for every page object.
 
-Page Object Model (POM), in one sentence:
-a page class holds the locators and the clicks; a test only calls those methods.
-
-The header menu is the same on every page of qapractice.com, so it lives here.
-Home, Contact, and the other pages inherit this class and add their own fields.
+The header menu is the same on every page of qapractice.com, so its
+locators and navigation methods live here. Actions go through click(),
+fill(), and select() so each one is logged with its selector.
 """
 
 import logging

@@ -1,7 +1,7 @@
 [project]
 name = "denis-automation-for-qapractice"
 version = "0.1.0"
-description = "Student Playwright + Pytest framework for https://www.qapractice.com/"
+description = "Playwright + pytest-bdd UI test framework for https://www.qapractice.com/"
 readme = "README.md"
 requires-python = ">=3.11"
 dependencies = [

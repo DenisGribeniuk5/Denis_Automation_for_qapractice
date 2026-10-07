@@ -1,10 +1,6 @@
 """
-Faker lives here, not in the data files.
-
-    from helper.fake import fake_name, fake_email, fake_sentence, fake_choice
-
-One Faker object is created when this file is imported. Every caller shares it,
-so a value you already asked for does not change on its own.
+Thin wrappers around one shared Faker instance, so data files do not
+depend on Faker directly.
 """
 
 from faker import Faker

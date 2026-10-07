@@ -1,5 +1,3 @@
-# Given = where you start. When = what you do. Then = what you expect.
-# And repeats the previous kind of step.
 Feature: Home page
 
   Background:

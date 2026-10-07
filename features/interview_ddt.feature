@@ -1,5 +1,3 @@
-# Data-driven version of interview.feature.
-# Each row in Examples runs the scenario once with that row's values.
 Feature: Interview library (data driven)
 
   @smoke
