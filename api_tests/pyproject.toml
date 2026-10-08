@@ -1,0 +1,27 @@
+[project]
+name = "denis-api-automation"
+version = "0.1.0"
+description = "pytest + requests API test framework for Restful Booker"
+readme = "README.md"
+requires-python = ">=3.11"
+dependencies = [
+    "allure-pytest>=2.16.2",
+    "faker>=40.40.0",
+    "pydantic>=2.9.0",
+    "pytest>=8.3.0",
+    "pytest-playwright>=0.9.0",
+    "pytest-xdist>=3.8.0",
+    "python-dotenv>=1.2.4",
+    "requests>=2.32.0",
+]
+
+[dependency-groups]
+dev = [
+    "ruff>=0.16.10",
+]
+
+[tool.ruff]
+line-length = 100
+
+[tool.ruff.lint]
+select = ["E", "F", "I", "B", "UP"]

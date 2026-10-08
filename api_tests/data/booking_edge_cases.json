@@ -1,0 +1,19 @@
+{
+  "accepted": [
+    {"id": "unicode names", "fields": {"firstname": "Zoë-Ann", "lastname": "漢字"}},
+    {"id": "apostrophe in name", "fields": {"lastname": "O'Brien"}},
+    {"id": "html is stored as text", "fields": {"firstname": "<script>alert(1)</script>"}},
+    {"id": "zero price", "fields": {"totalprice": 0}},
+    {"id": "one-night stay", "fields": {"bookingdates": {"checkin": "2031-03-10", "checkout": "2031-03-11"}}},
+    {"id": "empty additional needs", "fields": {"additionalneeds": ""}},
+    {"id": "240-char name", "fields": {"firstname": "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA"}}
+  ],
+  "should_be_rejected": [
+    {"id": "negative price", "fields": {"totalprice": -5}},
+    {"id": "price as text", "fields": {"totalprice": "abc"}},
+    {"id": "fractional price", "fields": {"totalprice": 12.7}},
+    {"id": "checkout before checkin", "fields": {"bookingdates": {"checkin": "2031-03-15", "checkout": "2031-03-10"}}},
+    {"id": "invalid date", "fields": {"bookingdates": {"checkin": "not-a-date", "checkout": "2031-03-10"}}},
+    {"id": "empty names", "fields": {"firstname": "", "lastname": ""}}
+  ]
+}

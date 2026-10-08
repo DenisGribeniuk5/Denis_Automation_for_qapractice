@@ -1,0 +1,48 @@
+name: API tests
+
+on:
+  push:
+    paths: ["api_tests/**", ".github/workflows/api-tests.yml"]
+  pull_request:
+    paths: ["api_tests/**", ".github/workflows/api-tests.yml"]
+  schedule:
+    - cron: "0 6 * * *"
+
+jobs:
+  pytest:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    defaults:
+      run:
+        working-directory: api_tests
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: astral-sh/setup-uv@v5
+        with:
+          enable-cache: true
+          cache-dependency-glob: api_tests/uv.lock
+
+      - name: Install dependencies
+        run: uv sync
+
+      - name: Lint
+        run: |
+          uv run ruff check .
+          uv run ruff format --check .
+
+      - name: Install Chromium
+        run: uv run playwright install --with-deps chromium
+
+      - name: Settings
+        run: cp .env.example .env
+
+      - name: Run tests
+        run: uv run pytest
+
+      - name: Upload Allure results
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: allure-results
+          path: api_tests/allure-results

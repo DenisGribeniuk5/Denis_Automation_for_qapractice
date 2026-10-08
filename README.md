@@ -4,6 +4,8 @@ Class project: UI tests for [QA Practice](https://www.qapractice.com/) with **Py
 
 The framework follows the Page Object Model and stays small on purpose (KISS). Locators live in `pages/`. Input values live in `data/`. Tests live in `tests/` and only call page methods.
 
+API tests (Restful Booker and the demoqa Book Store, with one API + UI test) are a separate project in [`api_tests/`](api_tests/README.md).
+
 Run every command in this folder, the one that contains this README. If the terminal prompt says `QA Practice`, move in first:
 
 ```bash
