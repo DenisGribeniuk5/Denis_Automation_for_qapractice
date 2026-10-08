@@ -2,7 +2,7 @@
 
 UI test framework for [qapractice.com](https://www.qapractice.com/), built with **Python**, **Playwright**, **pytest-bdd**, and **Allure**.
 
-48 scenarios cover the home page, the site menu, the practice-sites index, the interview question library (search and topic filters), and the contact form.
+50 scenarios cover the home page, the site menu, the practice-sites index, the interview question library (search and topic filters), the contact form, and the login sandbox (the public demo account, and a password the site rejects).
 
 ## Stack
 
@@ -44,8 +44,11 @@ config.py        BASE_URL
 ```bash
 uv sync
 uv run playwright install chromium
+cp .env.example .env
 uv run pytest
 ```
+
+GitHub Actions runs the same command on every push and pull request.
 
 Useful variations:
 
@@ -56,7 +59,7 @@ uv run pytest --headed --slowmo 500            # watch the browser
 uv run pytest --log-file-level=DEBUG           # also log locators and typed values
 ```
 
-Copy `.env.example` to `.env` for the practice accounts. The values are the public demo login from the site.
+`.env.example` holds the public demo login from the site. The login scenarios read it through `get_user`.
 
 ## Report and logs
 

@@ -20,6 +20,7 @@ from pages.about_page import AboutPage
 from pages.contact_page import ContactPage
 from pages.home_page import HomePage
 from pages.interview_page import InterviewPage
+from pages.login_page import LoginPage
 from pages.practice_sites_page import PracticeSitesPage
 
 # Lines from this file show as "tests: ..." in logs/tests.log.
@@ -78,6 +79,13 @@ def contact(page):
     contact_page = ContactPage(page)
     contact_page.open()
     return contact_page
+
+
+@pytest.fixture
+def login(page):
+    login_page = LoginPage(page)
+    login_page.open()
+    return login_page
 
 
 def pytest_runtest_logstart(nodeid, location):

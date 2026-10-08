@@ -12,11 +12,13 @@ from pytest_bdd import given, parsers, then, when
 
 from data.contact import CONTACT_MESSAGE
 from data.interview import SEARCH_QUERY
+from helper.users import get_user
 from pages.about_page import AboutPage
 from pages.base_page import BasePage
 from pages.contact_page import ContactPage
 from pages.home_page import HomePage
 from pages.interview_page import InterviewPage
+from pages.login_page import LoginPage
 from pages.practice_sites_page import PracticeSitesPage
 
 # Data-driven steps take a page name from the Examples table in a feature file.
@@ -27,6 +29,7 @@ PAGES = {
     "Interview Prep": InterviewPage,
     "About": AboutPage,
     "Contact": ContactPage,
+    "Login": LoginPage,
 }
 
 MENU_LINKS = {
@@ -62,6 +65,11 @@ def interview_page_is_open(interview):
 @given("the practice sites page is open", target_fixture="opened")
 def practice_sites_page_is_open(practice_sites):
     return practice_sites
+
+
+@given("the login page is open", target_fixture="opened")
+def login_page_is_open(login):
+    return login
 
 
 @given(parsers.parse('the "{value}" page is open'), target_fixture="opened")
@@ -139,6 +147,14 @@ def search_the_interview_library_for(opened, value):
 @when(parsers.parse('the user ticks the topic filter "{value}"'), target_fixture="opened")
 def tick_the_topic_filter(opened, value):
     opened.check_topic(value)
+    return opened
+
+
+@when(parsers.parse('the user signs in as "{value}"'), target_fixture="opened")
+def sign_in_as(opened, value):
+    """value is the account name in .env, for example "valid" or "invalid"."""
+    email, password = get_user(value)
+    opened.sign_in(email, password)
     return opened
 
 
@@ -294,3 +310,13 @@ def contact_form_shows(opened, name, email, topic, message):
 @then("the send button is visible")
 def send_button_is_visible(opened):
     expect(opened.submit_button).to_be_visible()
+
+
+@then(parsers.parse('the login success message contains "{value}"'))
+def login_success_message_contains(opened, value):
+    expect(opened.success_message).to_contain_text(value)
+
+
+@then(parsers.parse('the login error message contains "{value}"'))
+def login_error_message_contains(opened, value):
+    expect(opened.error_message).to_contain_text(value)
