@@ -22,7 +22,7 @@ class LoginPage(BasePage):
             ),
         )
         self.email_input = self.set_locator(
-            "email_input", page.get_by_test_id("login-email")
+            "email_input", page.get_by_test_id("login-emailfdgegrgergergmrbvgerjhfgejfkhegfjkwhegfkwhegfwjhefgwjehfgwejfhgwekfbwekeugh4kfubkw4hfw4kjgkw4fghkewufhbku4hgkuwhfkejfnwkjughk4jwbgkejgbk4ugbk3jbewkjgnbku4ghkejwbfkw")
         )
         self.password_input = self.set_locator(
             "password_input", page.get_by_test_id("login-password")
