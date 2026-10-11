@@ -1,0 +1,13 @@
+$kind: http-request
+name: User In
+description: ""
+url: https://demoqa.com/Account/v1/User/03396e60-fd3d-441f-a606-0e4da13c4169
+method: POST
+headers:
+  Accept: application/json
+body:
+  type: json
+  content: ""
+auth:
+  type: noauth
+order: 4469335302424534

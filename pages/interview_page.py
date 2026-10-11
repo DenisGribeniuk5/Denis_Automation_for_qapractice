@@ -1,8 +1,8 @@
 """
 Interview question library: https://www.qapractice.com/interview
 
-The search field is a searchbox in the accessibility tree, so get_by_role
-finds it by the label a screen reader would announce.
+The heading is found by its role. The search box and filters use the
+data-testid values the site provides.
 """
 
 from playwright.sync_api import Page
@@ -17,11 +17,10 @@ class InterviewPage(BasePage):
         super().__init__(page)
         self.heading = self.set_locator(
             "heading",
-            page.get_by_role("heading", name="Interview Question Library"),
+            page.get_by_role("heading", name="Interview Question Library", exact=True),
         )
         self.search_box = self.set_locator(
-            "search_box",
-            page.get_by_role("searchbox", name="Search interview questions"),
+            "search_box", page.get_by_test_id("library-search")
         )
         # data-testid is on the checkbox. The visible word "JavaScript"
         # is on the label. This is the JavaScript topic, not the
@@ -38,6 +37,17 @@ class InterviewPage(BasePage):
         self.question_cards = self.set_locator(
             "question_cards", page.locator("[data-testid^='question-card-']")
         )
+
+    def topic_checkbox(self, topic: str):
+        """The checkbox for one topic. topic is the end of its id, for example "python"."""
+        return self.set_locator(
+            f"{topic}_checkbox", self.page.get_by_test_id(f"filter-tech-{topic}")
+        )
+
+    def check_topic(self, topic: str):
+        """Tick any topic filter by clicking its label, the same way as check_javascript()."""
+        self.log.info("Tick %s filter", topic)
+        self.click(self.page.locator(f"label[for='tech-{topic}']"))
 
     def search(self, text: str):
         """Type into the library search. Playwright clears the box first with fill()."""

@@ -1,0 +1,28 @@
+name: UI tests
+
+on:
+  push:
+  pull_request:
+
+jobs:
+  pytest:
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: astral-sh/setup-uv@v5
+        with:
+          enable-cache: true
+
+      - name: Install dependencies
+        run: uv sync
+
+      - name: Install Chromium
+        run: uv run playwright install --with-deps chromium
+
+      - name: Practice accounts
+        run: cp .env.example .env
+
+      - name: Run tests
+        run: uv run pytest

@@ -16,5 +16,5 @@ class AboutPage(BasePage):
     def __init__(self, page: Page):
         super().__init__(page)
         self.heading = self.set_locator(
-            "heading", page.get_by_role("heading", name="About QA Practice")
+            "heading", page.get_by_role("heading", name="About QA Practice", exact=True)
         )
