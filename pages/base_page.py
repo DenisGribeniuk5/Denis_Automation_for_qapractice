@@ -1,11 +1,9 @@
 """
-Base page — shared behaviour for every screen.
+Shared behaviour for every page object.
 
-Page Object Model (POM), in one sentence:
-a page class holds the locators and the clicks; a test only calls those methods.
-
-The header menu is the same on every page of qapractice.com, so it lives here.
-Home, Contact, and the other pages inherit this class and add their own fields.
+The header menu is the same on every page of qapractice.com, so its
+locators and navigation methods live here. Actions go through click(),
+fill(), and select() so each one is logged with its selector.
 """
 
 import logging
@@ -31,17 +29,17 @@ class BasePage:
         self.logo = self.set_locator("logo", self.header.locator("a.navbar-brand"))
         self.practice_sites_link = self.set_locator(
             "practice_sites_link",
-            self.header.get_by_role("link", name="Practice Sites"),
+            self.header.get_by_role("link", name="Practice Sites", exact=True),
         )
         self.interview_link = self.set_locator(
             "interview_link",
-            self.header.get_by_role("link", name="Interview Prep"),
+            self.header.get_by_role("link", name="Interview Prep", exact=True),
         )
         self.about_link = self.set_locator(
-            "about_link", self.header.get_by_role("link", name="About")
+            "about_link", self.header.get_by_role("link", name="About", exact=True)
         )
         self.contact_link = self.set_locator(
-            "contact_link", self.header.get_by_role("link", name="Contact")
+            "contact_link", self.header.get_by_role("link", name="Contact", exact=True)
         )
 
     def set_locator(self, name, locator):

@@ -1,0 +1,19 @@
+$kind: http-request
+description: ""
+url: https://demoqa.com/BookStore/v1/Book
+method: DELETE
+headers:
+  Accept: application/json
+  Content-Type: application/json
+body:
+  type: json
+  content: |-
+    {
+      "isbn": "9781593277574",
+      "userId": "03396e60-fd3d-441f-a606-0e4da13c4169"
+    }
+auth:
+  type: bearer
+  credentials:
+    token: "{{json_web_token_0lq7}}"
+order: 4497623045474465
