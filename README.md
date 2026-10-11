@@ -58,8 +58,6 @@ cp .env.example .env
 uv run pytest
 ```
 
-GitHub Actions (`.github/workflows/tests.yml`) installs Chromium, copies `.env.example` to `.env`, and runs `uv run pytest` on every push and pull request. The action image does not have the Allure CLI, so the HTML report is produced on a machine where that command is installed.
-
 Useful variations:
 
 ```bash
@@ -71,6 +69,18 @@ uv run pytest --log-file-level=DEBUG           # also log locators and typed val
 
 `.env.example` holds the public demo login from the site. The login scenarios read it through `get_user`.
 
+## CI
+
+`.github/workflows/tests.yml` runs on every push and pull request:
+
+1. Check out the branch.
+2. Install dependencies with `uv sync`.
+3. Install Chromium with its system libraries.
+4. Copy `.env.example` to `.env`.
+5. Run `uv run pytest`.
+
+The job uses `ubuntu-latest` and stops after 45 minutes. The action image does not include the Allure CLI, so CI keeps the raw files in `allure-results/` and does not publish `reports/index.html`.
+
 ## Report and logs
 
 With the [Allure CLI](https://allurereport.org/docs/install/) installed, each run writes `reports/index.html`, a single file that opens straight from disk:
@@ -78,7 +88,6 @@ With the [Allure CLI](https://allurereport.org/docs/install/) installed, each ru
 ```bash
 open reports/index.html
 ```
-
 
 Without the CLI, pytest still passes and the raw results stay in `allure-results/`. Do not open a multi-file Allure report from disk: the browser blocks its data files and shows **500 Failed to fetch**.
 
