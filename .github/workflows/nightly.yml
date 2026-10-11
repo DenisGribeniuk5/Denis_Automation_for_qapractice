@@ -1,0 +1,79 @@
+name: Nightly UI tests
+
+# GitHub cron is five UTC fields: minute hour day-of-month month day-of-week.
+# "0 3 * * *" means minute 0, hour 3, every day, every month, every weekday.
+# That is 03:00 UTC, which is 10:00 PM EST (UTC-5).
+# During US daylight saving time that is 11:00 PM Eastern.
+# workflow_dispatch adds Run workflow on the Actions tab.
+# The branch field defaults to main. The nightly schedule has no inputs,
+# so that run also checks out main.
+on:
+  schedule:
+    - cron: "0 3 * * *"
+  workflow_dispatch:
+    inputs:
+      branch:
+        description: Branch to test
+        required: false
+        default: main
+        type: string
+      video:
+        description: "Record a video of each test: off, on, or retain-on-failure"
+        required: false
+        default: "off"
+        type: choice
+        options:
+          - "off"
+          - "on"
+          - retain-on-failure
+      save_results:
+        description: Save test results to artifacts
+        required: false
+        default: true
+        type: boolean
+
+jobs:
+  pytest:
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ inputs.branch || 'main' }}
+
+      - uses: astral-sh/setup-uv@v5
+        with:
+          enable-cache: true
+
+      - name: Install dependencies
+        run: uv sync
+
+      - name: Install Chromium
+        run: uv run playwright install --with-deps chromium
+
+      - name: Practice accounts
+        run: cp .env.example .env
+
+      # --video is a pytest-playwright option. Videos are written to test-results/.
+      # The nightly schedule has no form, so it records nothing and still
+      # uploads allure-results/ and logs/tests.log.
+      - name: Run tests
+        run: uv run pytest --video "${{ inputs.video || 'off' }}"
+
+      - name: Upload test results
+        if: always() && (github.event_name == 'schedule' || inputs.save_results)
+        uses: actions/upload-artifact@v4
+        with:
+          name: test-results
+          path: |
+            allure-results/
+            logs/tests.log
+          if-no-files-found: warn
+
+      - name: Upload videos
+        if: always() && inputs.video != 'off' && inputs.video != '' && (github.event_name == 'schedule' || inputs.save_results)
+        uses: actions/upload-artifact@v4
+        with:
+          name: videos
+          path: test-results/
+          if-no-files-found: warn
