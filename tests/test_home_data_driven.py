@@ -1,5 +1,6 @@
 """Data-driven home page scenarios. Sentences are defined in tests/conftest.py."""
 
+
 from pathlib import Path
 
 from pytest_bdd import scenarios

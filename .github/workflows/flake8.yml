@@ -1,0 +1,72 @@
+name: flake8
+
+# Pull requests only. A push to a branch has no pull request conversation,
+# so there is nowhere to put these comments.
+on:
+  pull_request:
+    types: [opened, synchronize, reopened]
+
+# GITHUB_TOKEN is created for each run. It can read the repo and write
+# pull request comments. It cannot do anything else.
+#
+# A pull request opened from a fork still cannot comment: GitHub drops
+# this token to read-only, so a fork cannot change the parent repository.
+# This workflow does not use pull_request_target. That event runs with a
+# write token in the base repository, which is unsafe for linting fork code.
+permissions:
+  contents: read
+  pull-requests: write
+
+# A new push to the same pull request cancels the run still in progress,
+# so two runs cannot post comments at the same time.
+concurrency:
+  group: flake8-${{ github.event.pull_request.number }}
+  cancel-in-progress: true
+
+jobs:
+  lint:
+    runs-on: ubuntu-latest
+    steps:
+      # Check out the pull request branch itself, not the temporary merge
+      # commit GitHub builds for the pull_request event. Review comments
+      # are attached to this commit, so flake8's line numbers have to
+      # match it.
+      - name: Check out the pull request
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.pull_request.head.sha }}
+
+      - name: Install uv
+        uses: astral-sh/setup-uv@v5
+
+      # flake8 exits 1 when it finds style issues. That is a result, not
+      # a crash, so this step always continues. The next step comments,
+      # then fails the job if a changed line has a finding.
+      #
+      # .venv is excluded because flake8 would otherwise lint installed
+      # packages. The default line length is 79. Add --max-line-length=100
+      # here if that is stricter than you want.
+      - name: Run flake8
+        run: |
+          set +e
+          uvx flake8==7.4.1 \
+            --exclude=.venv,.git,__pycache__,.pytest_cache \
+            --format='%(path)s::%(row)d::%(col)d::%(code)s::%(text)s' \
+            . > flake8-report.txt
+          status=$?
+          set -e
+          if [ "$status" -gt 1 ]; then
+            echo "flake8 failed to run (exit $status)"
+            cat flake8-report.txt
+            exit "$status"
+          fi
+
+      # github.token is the same GITHUB_TOKEN described above. It is not
+      # in the environment until this step passes it in. The script posts
+      # one summary comment and inline comments on changed lines.
+      - name: Comment on the pull request
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
+          PR_NUMBER: ${{ github.event.pull_request.number }}
+          HEAD_SHA: ${{ github.event.pull_request.head.sha }}
+        run: python3 .github/scripts/flake8_pr_comment.py
