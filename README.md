@@ -79,6 +79,7 @@ With the [Allure CLI](https://allurereport.org/docs/install/) installed, each ru
 open reports/index.html
 ```
 
+
 Without the CLI, pytest still passes and the raw results stay in `allure-results/`. Do not open a multi-file Allure report from disk: the browser blocks its data files and shows **500 Failed to fetch**.
 
 Each run also replaces `logs/tests.log`:
