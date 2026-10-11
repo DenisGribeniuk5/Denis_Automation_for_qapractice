@@ -1,0 +1,16 @@
+$kind: http-request
+name: https://demoqa.com/Account/v1/User
+description: ""
+url: https://demoqa.com/Account/v1/User
+method: POST
+headers:
+  Accept: application/json
+  Content-Type: application/json
+body:
+  type: json
+  content: |-
+    {
+      "userName": "user45",
+      "password": "TestPass!1"
+    }
+order: 1791381891275

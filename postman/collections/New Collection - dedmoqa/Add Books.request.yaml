@@ -1,0 +1,26 @@
+$kind: http-request
+description: ""
+url: https://demoqa.com/BookStore/v1/Books
+method: POST
+headers:
+  Accept: application/json
+  Content-Type: application/json
+body:
+  type: json
+  content: |-
+    {
+      "userId": "f8562218-641f-4616-9c6c-f550d8bd1263",
+      "collectionOfIsbns": [
+        {
+          "isbn": "9781449325862"
+        },
+        {
+          "isbn": "9781593277574"
+        }
+      ]
+    }
+auth:
+  type: bearer
+  credentials:
+    token: "{{json_web_token_05j7}}"
+order: 4495757666180093

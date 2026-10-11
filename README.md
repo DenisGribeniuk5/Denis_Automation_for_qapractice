@@ -1,13 +1,23 @@
 # QA Practice UI tests
 
-UI test framework for [qapractice.com](https://www.qapractice.com/), built with **Python**, **Playwright**, **pytest-bdd**, and **Allure**.
+UI test framework for [qapractice.com](https://www.qapractice.com/), built with **Python 3.12**, **Playwright**, **pytest-bdd**, and **Allure**.
 
-50 scenarios cover the home page, the site menu, the practice-sites index, the interview question library (search and topic filters), the contact form, and the login sandbox (the public demo account, and a password the site rejects).
+50 scenarios. Plain feature files check one path each. The `*_ddt.feature` files repeat that path from an Examples table.
+
+| Area | What is checked | Scenarios |
+| --- | --- | --- |
+| Home | Heading, hero buttons, and the path into the sandbox list | 6 |
+| Menu | Practice Sites, Interview Prep, About, Contact, and the logo back to home | 13 |
+| Practice sites | Each sandbox card opens its page | 10 |
+| Interview library | Search keeps the typed query; topic checkboxes filter the list | 13 |
+| Contact | The form accepts a message and does not open the mail client | 6 |
+| Login | The public demo account signs in; a wrong password is rejected | 2 |
 
 ## Stack
 
 | Concern | Tool |
 | --- | --- |
+| Language | Python 3.12, pinned in `.python-version` |
 | Browser automation | Playwright (sync API) via `pytest-playwright` |
 | Scenarios | Gherkin feature files run by `pytest-bdd` |
 | Reporting | Allure, saved as one HTML file, with a screenshot on failure |
@@ -48,7 +58,7 @@ cp .env.example .env
 uv run pytest
 ```
 
-GitHub Actions runs the same command on every push and pull request.
+GitHub Actions (`.github/workflows/tests.yml`) installs Chromium, copies `.env.example` to `.env`, and runs `uv run pytest` on every push and pull request. The action image does not have the Allure CLI, so the HTML report is produced on a machine where that command is installed.
 
 Useful variations:
 
@@ -63,7 +73,13 @@ uv run pytest --log-file-level=DEBUG           # also log locators and typed val
 
 ## Report and logs
 
-With the [Allure CLI](https://allurereport.org/docs/install/) installed, each run writes `reports/index.html`, a single file that opens straight from disk. Without it, the raw results stay in `allure-results/`.
+With the [Allure CLI](https://allurereport.org/docs/install/) installed, each run writes `reports/index.html`, a single file that opens straight from disk:
+
+```bash
+open reports/index.html
+```
+
+Without the CLI, pytest still passes and the raw results stay in `allure-results/`. Do not open a multi-file Allure report from disk: the browser blocks its data files and shows **500 Failed to fetch**.
 
 Each run also replaces `logs/tests.log`:
 
